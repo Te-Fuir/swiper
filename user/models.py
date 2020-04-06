@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 
 
@@ -22,3 +23,23 @@ class User(models.Model):
 
     def __str__(self):
         return f'<User {self.nickname}>'
+
+    @property
+    def age(self):
+        birthday = datetime.datetime(
+            year=self.birth_year,
+            month=self.birth_month,
+            day=self.birth_day
+        )
+        now = datetime.datetime.now()
+        return (now - birthday).days // 365
+
+    def to_dict(self):
+        return {
+            'phonenum': self.phonenum,
+            'nickname': self.nickname,
+            'sex': self.sex,
+            'avatar': self.avatar,
+            'location': self.location,
+            'age': self.age
+        }

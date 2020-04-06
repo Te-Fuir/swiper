@@ -18,4 +18,5 @@ import user.api as user_api
 
 urlpatterns = [
     url(r'^api/user/submit/phone/$', user_api.submit_phone),
+    url(r'^api/user/submit/vcode/$', user_api.submit_vcode),
 ]
