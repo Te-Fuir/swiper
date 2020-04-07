@@ -42,3 +42,11 @@ def submit_vcode(request):
     else:
         # 验证码错误
         return render_json(code=errors.VCODE_ERROR, data='验证码错误')
+
+
+def get_profile(request):
+    uid = request.session.get('uid')
+    if not uid:
+        return render_json(code=errors.LOGIN_REQUIRED, data='请登录')
+    user = User.objects.get(id=uid)
+    return render_json(data=user.profile.to_dict())
