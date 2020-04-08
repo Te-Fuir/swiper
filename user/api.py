@@ -1,12 +1,19 @@
+import os
+
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.cache import cache
+from django.conf import settings
 
+from lib.qiniu import upload_qiniu
 from lib.sms import send_sms
 from common import errors
 from lib.http import render_json
 from common import keys
+from user.forms import ProfileModelForm
+from user.logic import handle_upload
 from user.models import User
+from swiper import config
 
 
 def submit_phone(request):
@@ -45,8 +52,28 @@ def submit_vcode(request):
 
 
 def get_profile(request):
-    uid = request.session.get('uid')
-    if not uid:
-        return render_json(code=errors.LOGIN_REQUIRED, data='请登录')
-    user = User.objects.get(id=uid)
-    return render_json(data=user.profile.to_dict())
+    """获取个人资料"""
+    return render_json(data=request.user.profile.to_dict())
+
+
+def edit_profile(request):
+    """修改个人资料"""
+    form = ProfileModelForm(request.POST)
+    if form.is_valid():
+        # 可以接受并保存
+        profile = form.save(commit=False)
+        uid = request.user.id
+        profile.id = uid
+        profile.save()
+        return render_json(data=profile.to_dict())
+    return render_json(code=errors.PROFILE_ERROR, data=form.errors)
+
+
+def upload_avatar(request):
+    """上传个人头像"""
+    # 获取上传图片数据
+    avatar = request.FILES.get('avatar')
+    # 保存到指定的位置, 分块写入本地
+    user = request.user
+    handle_upload(user, avatar)
+    return render_json()
