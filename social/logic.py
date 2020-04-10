@@ -74,12 +74,10 @@ def rewind(user):
             record.delete()
             return 0, None
         except Swiped.DoesNotExist:
-            # return render_json(code=errors.NO_RECORD, data='无操作记录, 无法反悔')
-            return errors.NO_RECORD, '无操作记录, 无法反悔'
+            raise errors.NoRecordError
 
     else:
-        # return render_json(code=errors.EXCEED_MAXIMUM_REWIND, data='超过最大反悔次数')
-        return errors.EXCEED_MAXIMUM_REWIND, '超过最大反悔次数'
+        raise errors.ExceedMaximumRewindError
 
 
 def show_friends_list(user):
@@ -98,7 +96,5 @@ def show_friends_list(user):
 
 def show_friend_information(sid):
     users = User.objects.get(id=sid)
-    print(users)
     data = users.to_dict()
-    print(data)
     return data
