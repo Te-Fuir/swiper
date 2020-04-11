@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-import datetime
-
-from user.models import User
-
-
-def get_recd_list(request):
-    """获取推荐列表"""
-    user = request.user
-    now = datetime.datetime.now()
-    max_birth_year = now.year - user.profile.min_dating_age
-    min_birth_year = now.year - user.profile.max_dating_age
-    User.objects.filter(
-        location=user.profile.location
-    )
-=======
 from lib.http import render_json
 from social import logic
 
@@ -73,4 +57,3 @@ def show_friend_information(request):
     sid = request.POST.get('sid')
     data = logic.show_friend_information(sid=sid)
     return render_json(data=data)
->>>>>>> e2f8f67f61889cdaa33d98f73a2422a1596bb333

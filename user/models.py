@@ -5,8 +5,6 @@ from lib.mixins import ModelMixin
 from common import keys
 
 
-# Create your models here.
-
 class User(models.Model):
     SEX = (
         ('female', 'female'),
@@ -20,6 +18,8 @@ class User(models.Model):
     birth_day = models.IntegerField(default=1, verbose_name='出生日')
     avatar = models.CharField(max_length=256, verbose_name='个人形象')
     location = models.CharField(max_length=128, verbose_name='常居地')
+    # vip id
+    vip_id = models.IntegerField(default=1, verbose_name='用户所属vip的id')
 
     class Meta:
         db_table = 'user'
