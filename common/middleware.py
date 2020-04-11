@@ -3,6 +3,7 @@ from django.utils.deprecation import MiddlewareMixin
 from lib.http import render_json
 from common import errors
 from user.models import User
+from common.errors import LogicErr
 
 
 class AuthMiddleware(MiddlewareMixin):
@@ -19,3 +20,11 @@ class AuthMiddleware(MiddlewareMixin):
         # 如果登录了, 就把user写入request
         user = User.objects.get(id=uid)
         request.user = user
+
+
+class LogicErrMiddleware(MiddlewareMixin):
+    def process_exception(self, request, exception):
+        # 只捕获逻辑错误
+        if isinstance(exception, LogicErr):
+            return render_json(exception.code, exception.data)
+        return None
