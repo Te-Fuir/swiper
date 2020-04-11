@@ -1,11 +1,7 @@
-import os
+import logging
 
-from django.shortcuts import render
-from django.http import JsonResponse
 from django.core.cache import cache
-from django.conf import settings
 
-from lib.qiniu import upload_qiniu
 from lib.sms import send_sms
 from common import errors
 from lib.http import render_json
@@ -13,7 +9,9 @@ from common import keys
 from user.forms import ProfileModelForm
 from user.logic import handle_upload
 from user.models import User
-from swiper import config
+
+logger_info = logging.getLogger('inf')
+logger_error = logging.getLogger('err')
 
 
 def submit_phone(request):
@@ -21,6 +19,7 @@ def submit_phone(request):
     phone = request.POST.get('phone')
     # 发送验证码
     send_sms.delay(phone)
+
     return render_json()
 
 
@@ -64,8 +63,12 @@ def edit_profile(request):
         profile.save()
         # 更新缓存
         cache.set(keys.PROFILE_KEY % uid, profile, 86400 * 14)
+
+        logger_info.info(f'{request.user.nickname} modify profile success')
+
         return render_json(data=profile.to_dict())
     else:
+        logger_error.error(f'{request.user.nickname} modify profile error')
         raise errors.ProfileError
 
 

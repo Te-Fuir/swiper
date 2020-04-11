@@ -22,3 +22,4 @@ LoginRequiredError = gen_logic_err('LoginRequiredError', code=1002, data='请登
 ProfileError = gen_logic_err('ProfileError', code=1003, data='个人交友资料数据不合法')
 ExceedMaximumRewindError = gen_logic_err('ExceedMaximumRewindError', code=1004, data='超出今日反悔次数')
 NoRecordError = gen_logic_err('NoRecordError', code=1005, data='没有记录, 无法反悔')
+PermissionDeniedError = gen_logic_err('PermissionDeniedError', code=1006, data='权限不足')

@@ -3,6 +3,7 @@ from django.db import models
 from django.core.cache import cache
 from lib.mixins import ModelMixin
 from common import keys
+from vip.models import Vip
 
 
 class User(models.Model):
@@ -20,6 +21,18 @@ class User(models.Model):
     location = models.CharField(max_length=128, verbose_name='常居地')
     # vip id
     vip_id = models.IntegerField(default=1, verbose_name='用户所属vip的id')
+
+    @property
+    def vip(self):
+        """根据vip_id取出user对应的vip对象"""
+        # 先从缓存获取
+        if not hasattr(self, '_vip'):
+            key = keys.VIP_KEY % self.id
+            self._vip = cache.get(key)
+            if not self._vip:
+                self._vip = Vip.objects.get(id=self.vip_id)
+                cache.set(key, self._vip, 86400 * 14)
+        return self._vip
 
     class Meta:
         db_table = 'user'

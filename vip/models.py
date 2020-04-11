@@ -9,6 +9,15 @@ class Vip(models.Model):
     def __str__(self):
         return f'<Vip {self.level}>'
 
+    def has_perm(self, perm_name):
+        # 先取出当前vip所具有的所有权限
+        perm_id_list = VipPermRelation.objects.filter(vip_id=self.id).only('perm_id')
+        perms = Permission.objects.filter(id__in=perm_id_list)
+        for perm in perms:
+            if perm_name == perm:
+                return True
+        return False
+
 
 class Permission(models.Model):
     name = models.CharField(max_length=128, verbose_name='权限名称')

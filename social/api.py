@@ -1,5 +1,6 @@
 from lib.http import render_json
 from social import logic
+from vip.logic import need_perm
 
 
 def get_recd_list(request):
@@ -27,6 +28,7 @@ def dislike(request):
     return render_json(data={'unmatch': flag})
 
 
+@need_perm('superlike')
 def superlike(request):
     user = request.user
     sid = int(request.POST.get('sid'))
@@ -34,6 +36,7 @@ def superlike(request):
     return render_json(data={'match': flag})
 
 
+@need_perm('rewind')
 def rewind(request):
     """
     每天允许反悔3次, 把已经反悔的次数记录在redis中
