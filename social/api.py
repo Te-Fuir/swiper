@@ -1,6 +1,10 @@
+from common import keys
 from lib.http import render_json
 from social import logic
+from swiper import config
+from user.models import User
 from vip.logic import need_perm
+from lib.cache import rds
 
 
 def get_recd_list(request):
@@ -17,6 +21,8 @@ def like(request):
     user = request.user
     sid = int(request.POST.get('sid'))
     flag = logic.like(user.id, sid)
+    # 　喜欢加５分
+    rds.zincrby(config.HOT_RANK, config.LIKE_SCORE, keys.HOT_RANK_KEY % sid)
     return render_json(data={'match': flag})
 
 
@@ -25,6 +31,7 @@ def dislike(request):
     print(request.POST.get('sid'))
     sid = int(request.POST.get('sid'))
     flag = logic.dislike(user.id, sid)
+    rds.zincrby(config.HOT_RANK, config.DISLIKE_SCORE, keys.HOT_RANK_KEY % sid)
     return render_json(data={'unmatch': flag})
 
 
@@ -33,6 +40,7 @@ def superlike(request):
     user = request.user
     sid = int(request.POST.get('sid'))
     flag = logic.superlike(user.id, sid)
+    rds.zincrby(config.HOT_RANK, config.SUPERLIKE_SCORE, keys.HOT_RANK_KEY % sid)
     return render_json(data={'match': flag})
 
 
@@ -59,4 +67,10 @@ def show_friend_information(request):
     """查看好友信息"""
     sid = request.POST.get('sid')
     data = logic.show_friend_information(sid=sid)
+    return render_json(data=data)
+
+
+def get_top_n(request):
+    """获取排行榜列表"""
+    data = logic.get_top_n()
     return render_json(data=data)

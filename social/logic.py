@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.db.models import Q
 
 from common import keys, errors
+from lib.cache import rds
 from lib.http import render_json
 from social.models import Swiped, Friend
 from swiper import config
@@ -97,4 +98,23 @@ def show_friends_list(user):
 def show_friend_information(sid):
     users = User.objects.get(id=sid)
     data = users.to_dict()
+    return data
+
+
+def get_top_n():
+    # 取出redis中的得分排行
+    score_list = rds.zrevrange('Hot-Rank', 0, config.TOP_N, withscore=True)
+    cleaned_data = [(int(uid), score) for uid, score in score_list]
+    uid_list = [uid for uid, _ in cleaned_data]
+    users = User.objects.filter(id__in=uid_list)
+    # 对users进行排序
+    users = sorted(users, key=lambda user: uid_list.index(user.id))
+    # 生成数据
+    data = []
+    for rank, (_, score), user in zip(range(1, config.TOP_N + 1), cleaned_data, users):
+        temp = {}
+        temp['rank'] = rank
+        temp['score'] = score
+        temp.update(user.to_dict())
+        data.append(temp)
     return data
