@@ -52,8 +52,8 @@ def rewind(request):
     """
     # 先从缓存中获取当天已经反悔的次数
     user = request.user
-    code, data = logic.rewind(user)
-    return render_json(code, data)
+    logic.rewind(user)
+    return render_json()
 
 
 def show_friends_list(request):

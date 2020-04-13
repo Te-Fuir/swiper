@@ -11,7 +11,8 @@ class Vip(models.Model):
 
     def has_perm(self, perm_name):
         # 先取出当前vip所具有的所有权限
-        perm_id_list = VipPermRelation.objects.filter(vip_id=self.id).only('perm_id')
+        relations = VipPermRelation.objects.filter(vip_id=self.id).only('perm_id')
+        perm_id_list = [r.perm_id for r in relations]
         perms = Permission.objects.filter(id__in=perm_id_list)
         for perm in perms:
             if perm_name == perm:

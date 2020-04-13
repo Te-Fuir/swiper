@@ -30,7 +30,7 @@ class User(models.Model):
             key = keys.VIP_KEY % self.id
             self._vip = cache.get(key)
             if not self._vip:
-                self._vip = Vip.objects.get(id=self.vip_id)
+                self._vip = Vip.get(id=self.vip_id)
                 cache.set(key, self._vip, 86400 * 14)
         return self._vip
 
@@ -61,7 +61,7 @@ class User(models.Model):
             self._profile = cache.get(key)
             if not self._profile:
                 # 缓存中没有, 从数据库获取
-                profile, _ = Profile.objects.get_or_create(id=self.id)
+                profile, _ = Profile.get_or_create(id=self.id)
                 # 放入缓存
                 cache.set(key, self._profile, timeout=86400 * 14)
         return self._profile
@@ -78,7 +78,7 @@ class User(models.Model):
         }
 
 
-class Profile(models.Model, ModelMixin):
+class Profile(models.Model):
     SEX = (
         ('female', 'female'),
         ('male', 'male')

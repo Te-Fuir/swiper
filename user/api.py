@@ -33,12 +33,12 @@ def submit_vcode(request):
     if vcode == cached_vcode:
         # 说明验证码正确, 可以登录或者注册
         # try:
-        #     user = User.objects.get(phonenum=phone)
+        #     user = User.get(phonenum=phone)
         # except User.DoesNotExist:
         #     # 说明是注册
         #     user = User.objects.create(phonenum=phone, nickname=phone)
 
-        user, _ = User.objects.get_or_create(phonenum=phone, defaults={'nickname': phone})
+        user, _ = User.get_or_create(phonenum=phone, defaults={'nickname': phone})
         # 把用户的id存入session中, 完成登录
         request.session['uid'] = user.id
         return render_json(data=user.to_dict())

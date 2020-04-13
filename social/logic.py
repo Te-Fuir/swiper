@@ -72,6 +72,14 @@ def rewind(user):
             record = Swiped.objects.filter(uid=user.id).latest('time')
             # 考虑如果有好友关系, 反悔之后好友关系也解除
             Friend.delete_friend(uid1=user.id, uid2=record.sid)
+            # 优化, 使用模式匹配.
+            mapping = {
+                'like': config.LIKE_SCORE,
+                'dislike': config.DISLIKE_SCORE,
+                'superlike': config.SUPERLIKE_SCORE
+            }
+            rds.zincrby(config.HOT_RANK, -mapping[record.mark],
+                        keys.HOT_RANK_KEY % record.sid)
             record.delete()
             return 0, None
         except Swiped.DoesNotExist:
@@ -96,7 +104,7 @@ def show_friends_list(user):
 
 
 def show_friend_information(sid):
-    users = User.objects.get(id=sid)
+    users = User.get(id=sid)
     data = users.to_dict()
     return data
 
